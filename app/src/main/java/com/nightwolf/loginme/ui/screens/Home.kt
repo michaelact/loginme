@@ -13,10 +13,12 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.Image
 import androidx.compose.ui.res.painterResource
 import androidx.compose.material.icons.filled.Notifications
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
 import coil3.compose.AsyncImage
 import coil3.request.ImageRequest
 import coil3.request.crossfade
@@ -26,7 +28,7 @@ import com.nightwolf.loginme.repository.CourseRepository
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun HomeScreen() {
+fun HomeScreen(navController: NavController) {
     var searchQuery by remember { mutableStateOf("") }
 
     Scaffold(
@@ -54,6 +56,16 @@ fun HomeScreen() {
             )
         }
     ) { padding ->
+        // Background image
+        Image(
+            painter = painterResource(id = R.drawable.ic_launcher_background),
+            contentDescription = null,
+            modifier = Modifier
+                .fillMaxSize()
+                .alpha(0.1f),
+            contentScale = ContentScale.Crop
+        )
+
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -89,7 +101,10 @@ fun HomeScreen() {
                 items(CourseRepository.courses) { course ->
                     CourseCard(
                         course = course,
-                        modifier = Modifier.width(280.dp)
+                        modifier = Modifier.width(280.dp),
+                        onClick = { selectedCourse ->
+                            navController.navigate("course_detail/${selectedCourse.id}")
+                        }
                     )
                 }
             }
@@ -154,11 +169,12 @@ fun CircleAvatar(
 @Composable
 fun CourseCard(
     course: Course,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    onClick: (Course) -> Unit
 ) {
     Card(
         modifier = modifier,
-        onClick = { /* TODO: Navigate to course details */ }
+        onClick = { onClick(course) }
     ) {
         Column {
             Box(

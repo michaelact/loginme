@@ -14,8 +14,10 @@ import androidx.navigation.compose.rememberNavController
 import com.nightwolf.loginme.ui.screens.WelcomeScreen
 import com.nightwolf.loginme.ui.screens.LoginScreen
 import com.nightwolf.loginme.ui.screens.RegisterScreen
+import com.nightwolf.loginme.ui.screens.CourseDetailScreen
 import com.nightwolf.loginme.ui.theme.LoginMeTheme
 import com.nightwolf.loginme.ui.screens.HomeScreen
+import com.nightwolf.loginme.repository.CourseRepository
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -38,6 +40,13 @@ fun AppNavigation() {
     val navController = rememberNavController()
 
     NavHost(navController = navController, startDestination = "welcome") {
+        composable("course_detail/{courseId}") { backStackEntry ->
+            val courseId = backStackEntry.arguments?.getString("courseId")?.toIntOrNull()
+            val course = CourseRepository.courses.find { it.id == courseId }
+            course?.let {
+                CourseDetailScreen(course = it, onBack = { navController.navigateUp() })
+            }
+        }
         composable("welcome") {
             WelcomeScreen(
                 onNavigateToLogin = {
@@ -76,7 +85,7 @@ fun AppNavigation() {
             )
         }
         composable("home") {
-            HomeScreen()
+            HomeScreen(navController = navController)
         }
     }
 }
